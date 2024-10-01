@@ -1,0 +1,27 @@
+version: '3'
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    ports:
+      - "27017:27017"  # Expose MongoDB port
+    volumes:
+      - mongo-data:/data/db  # Persistent storage for MongoDB
+    environment:
+      # TODO: Set root username and password for MongoDB inside ENV
+       - MONGO_URI=mongodb://root:example@mongo:27017/mydb?authSource=admin 
+
+  backend:
+    build: ./backend
+    container_name: tamago-be
+    ports:
+      - "3000:3000"  # Expose backend port
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/mydb  # Connection string for MongoDB
+    volumes:
+      - ./backend:/usr/src/app  # Mount your backend code for live-reloading
+    depends_on:
+      - mongo  # Ensure backend starts after MongoDB is ready
+
+volumes:
+  mongo-data:
